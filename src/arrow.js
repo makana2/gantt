@@ -2,7 +2,7 @@ import { createSVG } from './svg_utils';
 
 export default class Arrow {
     constructor(gantt, from_task, to_task, type) {
-        console.log(type)
+        //console.log(type)
         this.gantt = gantt;
         this.from_task = from_task;
         this.to_task = to_task;
@@ -43,11 +43,11 @@ export default class Arrow {
 
     calculate_path_type_fs() {
         let data = this.get_start_end();
-        console.log('[START X, START Y, END X, END Y] ', this.get_start_end())
+        //console.log('[START X, START Y, END X, END Y] ', this.get_start_end())
         const from_is_below_to = this.from_task.task._index > this.to_task.task._index;
 
         const right = data.start_x + 2*this.gantt.options.padding;
-         const down1 = from_is_below_to ? this.gantt.options.bar_height / 2 - 2 * this.gantt.options.padding : this.gantt.options.bar_height / 2 + 2* this.gantt.options.padding
+         const down1 = from_is_below_to ? this.gantt.options.bar_height / 2 - 2 * this.gantt.options.padding : - this.gantt.options.bar_height / 2 + 2* this.gantt.options.padding
         if (data.start_x < data.end_x) {
             this.path = `
                 M ${data.start_x} ${data.start_y}
@@ -89,7 +89,7 @@ export default class Arrow {
         const from_is_below_to = this.from_task.task._index > this.to_task.task._index;
 
         const left = data.start_x - 2*this.gantt.options.padding;
-        const down1 = from_is_below_to ? this.gantt.options.bar_height / 2 - 2 * this.gantt.options.padding : this.gantt.options.bar_height / 2 + 2* this.gantt.options.padding
+        const down1 = from_is_below_to ? this.gantt.options.bar_height / 2 - 2 * this.gantt.options.padding : -this.gantt.options.bar_height / 2 + 2* this.gantt.options.padding
         if (data.start_x >= data.end_x) {
             this.path = `
                 M ${data.start_x} ${data.start_y}
@@ -146,7 +146,7 @@ export default class Arrow {
                 this.to_task.task._index +
             this.gantt.options.padding / 2;
 
-        console.log(start_x, start_y, end_x, end_y)
+        //console.log(start_x, start_y, end_x, end_y)
         
         return {start_x: start_x, start_y: start_y, end_x: end_x, end_y: end_y};
     }
