@@ -12,7 +12,7 @@ const tasks = [
         name: 'Develop wireframe',
         id: 'Task 1',
         progress: random(),
-        dependencies: 'Task 0',
+        dependencies: {id: 'Task 0', type: 'AA'},
     },
     {
         start: daysSince(-1),

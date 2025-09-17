@@ -1,91 +1,154 @@
 import { createSVG } from './svg_utils';
 
 export default class Arrow {
-    constructor(gantt, from_task, to_task) {
+    constructor(gantt, from_task, to_task, type) {
+        console.log(type)
         this.gantt = gantt;
         this.from_task = from_task;
         this.to_task = to_task;
+        this.type = type;
+        // types: AA, AE, EA, EE
 
-        this.calculate_path();
+        switch (type) {
+            case "AA":
+                this.calculate_path_type_ss();
+                break;
+            case "EE":
+                this.calculate_path_type_ff();
+                break;
+            case "AE":
+                this.calculate_path_type_sf();
+                break;
+            case "EA":
+                this.calculate_path_type_fs();
+                break;
+        }
+
+        //this.calculate_path();
         this.draw();
     }
 
-    calculate_path() {
-        let start_x =
-            this.from_task.$bar.getX() + this.from_task.$bar.getWidth() / 2;
+    calculate_path_type_ss() {
+        let data = this.get_start_end();
+        const left = data.start_x - 2*this.gantt.options.padding;
+        this.path = `
+                M ${data.start_x} ${data.start_y}
+                H ${left}
+                V ${data.end_y}
+                H ${data.end_x}
+                m -5 -5
+                l 5 5
+                l -5 5`;
+    }
 
-        const condition = () =>
-            this.to_task.$bar.getX() < start_x + this.gantt.options.padding &&
-            start_x > this.from_task.$bar.getX() + this.gantt.options.padding;
+    calculate_path_type_fs() {
+        let data = this.get_start_end();
+        console.log('[START X, START Y, END X, END Y] ', this.get_start_end())
+        const from_is_below_to = this.from_task.task._index > this.to_task.task._index;
 
-        while (condition()) {
-            start_x -= 10;
+        const right = data.start_x + 2*this.gantt.options.padding;
+         const down1 = from_is_below_to ? this.gantt.options.bar_height / 2 - 2 * this.gantt.options.padding : this.gantt.options.bar_height / 2 + 2* this.gantt.options.padding
+        if (data.start_x < data.end_x) {
+            this.path = `
+                M ${data.start_x} ${data.start_y}
+                H ${right}
+                V ${data.end_y}
+                H ${data.end_x}
+                m -5 -5
+                l 5 5
+                l -5 5`;
+        } else {
+            this.path = `
+                M ${data.start_x} ${data.start_y}
+                H ${right}
+                v ${down1}
+                H ${data.end_x - 2* this.gantt.options.padding}
+                V ${data.end_y}
+                H ${data.end_x}
+                m -5 -5
+                l 5 5
+                l -5 5`;
         }
-        start_x -= 10;
 
-        let start_y =
+    }
+    calculate_path_type_ff() {
+        let data = this.get_start_end();
+        const right = data.start_x + 2*this.gantt.options.padding;
+        this.path = `
+                M ${data.start_x} ${data.start_y}
+                H ${right}
+                V ${data.end_y}
+                H ${data.end_x}
+                m 5 -5
+                l -5 5
+                l 5 5`;
+
+    }
+    calculate_path_type_sf() {
+        let data = this.get_start_end();
+        const from_is_below_to = this.from_task.task._index > this.to_task.task._index;
+
+        const left = data.start_x - 2*this.gantt.options.padding;
+        const down1 = from_is_below_to ? this.gantt.options.bar_height / 2 - 2 * this.gantt.options.padding : this.gantt.options.bar_height / 2 + 2* this.gantt.options.padding
+        if (data.start_x >= data.end_x) {
+            this.path = `
+                M ${data.start_x} ${data.start_y}
+                H ${left}
+                V ${data.end_y}
+                H ${data.end_x}
+                m 5 -5
+                l -5 5
+                l 5 5`;
+        } else {
+            this.path = `
+                M ${data.start_x} ${data.start_y}
+                H ${left}
+                v ${down1}
+                H ${data.end_x + 2* this.gantt.options.padding}
+                V ${data.end_y}
+                H ${data.end_x}
+                m 5 -5
+                l -5 5
+                l 5 5`;
+        }
+
+    }
+
+    get_start_end() {
+        let start_x;
+        let start_y;
+        let end_x;
+        let end_y;
+
+        if (this.type == "AA" || this.type == "AE") {
+            start_x = this.from_task.$bar.getX();
+        } else {
+            start_x = this.from_task.$bar.getX() + this.from_task.$bar.getWidth() - 3;
+        }
+
+        if (this.type == "AA" || this.type == "EA") {
+            end_x = this.to_task.$bar.getX() - 3;
+        } else {
+            end_x = this.to_task.$bar.getX() + this.to_task.$bar.getWidth() + 3;
+        }
+        
+        start_y =
             this.gantt.config.header_height +
             this.gantt.options.bar_height +
             (this.gantt.options.padding + this.gantt.options.bar_height) *
                 this.from_task.task._index +
-            this.gantt.options.padding / 2;
+            this.gantt.options.padding / 2 - this.gantt.options.bar_height/2;
 
-        let end_x = this.to_task.$bar.getX() - 13;
-        let end_y =
+        end_y =
             this.gantt.config.header_height +
             this.gantt.options.bar_height / 2 +
             (this.gantt.options.padding + this.gantt.options.bar_height) *
                 this.to_task.task._index +
             this.gantt.options.padding / 2;
 
-        const from_is_below_to =
-            this.from_task.task._index > this.to_task.task._index;
-
-        let curve = this.gantt.options.arrow_curve;
-        const clockwise = from_is_below_to ? 1 : 0;
-        let curve_y = from_is_below_to ? -curve : curve;
-
-        if (
-            this.to_task.$bar.getX() <=
-            this.from_task.$bar.getX() + this.gantt.options.padding
-        ) {
-            let down_1 = this.gantt.options.padding / 2 - curve;
-            if (down_1 < 0) {
-                down_1 = 0;
-                curve = this.gantt.options.padding / 2;
-                curve_y = from_is_below_to ? -curve : curve;
-            }
-            const down_2 =
-                this.to_task.$bar.getY() +
-                this.to_task.$bar.getHeight() / 2 -
-                curve_y;
-            const left = this.to_task.$bar.getX() - this.gantt.options.padding;
-            this.path = `
-                M ${start_x} ${start_y}
-                v ${down_1}
-                a ${curve} ${curve} 0 0 1 ${-curve} ${curve}
-                H ${left}
-                a ${curve} ${curve} 0 0 ${clockwise} ${-curve} ${curve_y}
-                V ${down_2}
-                a ${curve} ${curve} 0 0 ${clockwise} ${curve} ${curve_y}
-                L ${end_x} ${end_y}
-                m -5 -5
-                l 5 5
-                l -5 5`;
-        } else {
-            if (end_x < start_x + curve) curve = end_x - start_x;
-
-            let offset = from_is_below_to ? end_y + curve : end_y - curve;
-
-            this.path = `
-              M ${start_x} ${start_y}
-              V ${offset}
-              a ${curve} ${curve} 0 0 ${clockwise} ${curve} ${curve}
-              L ${end_x} ${end_y}
-              m -5 -5
-              l 5 5
-              l -5 5`;
-        }
+        console.log(start_x, start_y, end_x, end_y)
+        
+        return {start_x: start_x, start_y: start_y, end_x: end_x, end_y: end_y};
     }
 
     draw() {

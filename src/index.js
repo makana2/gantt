@@ -173,19 +173,22 @@ export default class Gantt {
                 }
 
                 // dependencies
-                if (
-                    typeof task.dependencies === 'string' ||
-                    !task.dependencies
-                ) {
-                    let deps = [];
-                    if (task.dependencies) {
-                        deps = task.dependencies
-                            .split(',')
-                            .map((d) => d.trim().replaceAll(' ', '_'))
-                            .filter((d) => d);
-                    }
-                    task.dependencies = deps;
+                // {id: string, type: string}
+                //type: AA, AE, EA, EE
+                if (!task.dependencies) {
+                    task.dependencies = [];
                 }
+               
+                    // let deps = [];
+                    // if (task.dependencies) {
+                    //     deps = task.dependencies
+                    //         .split(',')
+                    //         .map((d) => d.trim().replaceAll(' ', '_'))
+                    //         .filter((d) => d);
+                    // }
+                    // task.dependencies = deps;
+                // -> muss man nicht mehr, weil array as input
+                
 
                 // uids
                 if (!task.id) {
@@ -205,11 +208,14 @@ export default class Gantt {
     setup_dependencies() {
         this.dependency_map = {};
         for (let t of this.tasks) {
-            for (let d of t.dependencies) {
+            console.log('[TASK] ', t)
+            for (let d of t.dependencies.map((d) => d.id)) {
                 this.dependency_map[d] = this.dependency_map[d] || [];
                 this.dependency_map[d].push(t.id);
             }
         }
+
+        console.log('[DEPENDENCY MAP] ', this.dependency_map )
     }
 
     refresh(tasks) {
@@ -862,15 +868,20 @@ export default class Gantt {
     make_arrows() {
         this.arrows = [];
         for (let task of this.tasks) {
+            console.log('[TASK DEPENDENCIES]' , task.dependencies)
             let arrows = [];
             arrows = task.dependencies
-                .map((task_id) => {
-                    const dependency = this.get_task(task_id);
+                .map((dep) => {
+                    console.log('[DEP ID, DEP TYPE] ', dep.id, dep.type)
+                    const dependency = this.get_task(dep.id);
+                    console.log('[TASKS] ', this.tasks)
+                    console.log('[FOUND TASK] ', dependency)
                     if (!dependency) return;
                     const arrow = new Arrow(
                         this,
                         this.bars[dependency._index], // from_task
                         this.bars[task._index], // to_task
+                        dep.type
                     );
                     this.layers.arrow.appendChild(arrow.element);
                     return arrow;

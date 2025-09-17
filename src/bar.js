@@ -423,7 +423,7 @@ export default class Bar {
 
         if (x) {
             const xs = this.task.dependencies.map((dep) => {
-                return this.gantt.get_bar(dep).$bar.getX();
+                return this.gantt.get_bar(dep.id).$bar.getX();
             });
             const valid_x = xs.reduce((prev, curr) => {
                 return prev && x >= curr;
