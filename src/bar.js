@@ -415,7 +415,7 @@ export default class Bar {
                 this.gantt.popup.parent.classList.remove('hide');
 
             this.gantt.trigger_event('double_click', [this.task]);
-        });
+        }, { passive: true });
     }
 
     update_bar_position({ x = null, width = null }) {

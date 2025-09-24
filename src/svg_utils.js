@@ -80,12 +80,12 @@ function cubic_bezier(name) {
     }[name];
 }
 
-$.on = (element, event, selector, callback) => {
+$.on = (element, event, selector, callback, options = false) => {
     if (!callback) {
         callback = selector;
-        $.bind(element, event, callback);
+        $.bind(element, event, callback, options);
     } else {
-        $.delegate(element, event, selector, callback);
+        $.delegate(element, event, selector, callback, options);
     }
 };
 
@@ -93,20 +93,20 @@ $.off = (element, event, handler) => {
     element.removeEventListener(event, handler);
 };
 
-$.bind = (element, event, callback) => {
+$.bind = (element, event, callback, options) => {
     event.split(/\s+/).forEach(function (event) {
-        element.addEventListener(event, callback);
+        element.addEventListener(event, callback, options);
     });
 };
 
-$.delegate = (element, event, selector, callback) => {
+$.delegate = (element, event, selector, callback, options) => {
     element.addEventListener(event, function (e) {
         const delegatedTarget = e.target.closest(selector);
         if (delegatedTarget) {
             e.delegatedTarget = delegatedTarget;
             callback.call(this, e, delegatedTarget);
         }
-    });
+    }, options);
 };
 
 $.closest = (selector, element) => {

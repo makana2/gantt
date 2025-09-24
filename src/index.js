@@ -1190,7 +1190,7 @@ export default class Gantt {
                     e.currentTarget.scrollLeft = old_scroll_left;
                     setTimeout(() => (extended = false), 300);
                 }
-            });
+            }, { passive: true });
         }
 
         $.on(this.$container, 'scroll', (e) => {
