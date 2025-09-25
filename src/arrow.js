@@ -31,10 +31,14 @@ export default class Arrow {
     calculate_path_type_ss() {
         let data = this.get_start_end();
         const left = data.start_x - 2*this.gantt.options.padding;
+        var offset = 1;
+        if (data.start_y > data.end_y) {
+            offset *= -1;
+        }
         this.path = `
-                M ${data.start_x} ${data.start_y}
+                M ${data.start_x} ${data.start_y + offset*6}
                 H ${left}
-                V ${data.end_y}
+                V ${data.end_y - offset*4}
                 H ${data.end_x}
                 m -5 -5
                 l 5 5
@@ -47,23 +51,29 @@ export default class Arrow {
         const from_is_below_to = this.from_task.task._index > this.to_task.task._index;
 
         const right = data.start_x + 2*this.gantt.options.padding;
-         const down1 = from_is_below_to ? this.gantt.options.bar_height / 2 - 2 * this.gantt.options.padding : - this.gantt.options.bar_height / 2 + 2* this.gantt.options.padding
+        const down1 = from_is_below_to ? this.gantt.options.bar_height / 2 - 2 * this.gantt.options.padding : - this.gantt.options.bar_height / 2 + 2* this.gantt.options.padding
+
+        var offset = 1;
+        if (data.start_y > data.end_y) {
+            offset *= -1;
+        }
+
         if (data.start_x < data.end_x) {
             this.path = `
-                M ${data.start_x} ${data.start_y}
+                M ${data.start_x} ${data.start_y + offset*6}
                 H ${right}
-                V ${data.end_y}
+                V ${data.end_y - offset*4}
                 H ${data.end_x}
                 m -5 -5
                 l 5 5
                 l -5 5`;
         } else {
             this.path = `
-                M ${data.start_x} ${data.start_y}
+                M ${data.start_x} ${data.start_y + offset*6}
                 H ${right}
                 v ${down1}
                 H ${data.end_x - 2* this.gantt.options.padding}
-                V ${data.end_y}
+                V ${data.end_y - offset*4}
                 H ${data.end_x}
                 m -5 -5
                 l 5 5
@@ -74,10 +84,15 @@ export default class Arrow {
     calculate_path_type_ff() {
         let data = this.get_start_end();
         const right = data.start_x + 2*this.gantt.options.padding;
+        var offset = 1;
+        if (data.start_y > data.end_y) {
+            offset *= -1;
+        }
+
         this.path = `
-                M ${data.start_x} ${data.start_y}
+                M ${data.start_x} ${data.start_y + offset*6}
                 H ${right}
-                V ${data.end_y}
+                V ${data.end_y - offset*4}
                 H ${data.end_x}
                 m 5 -5
                 l -5 5
@@ -90,22 +105,28 @@ export default class Arrow {
 
         const left = data.start_x - 2*this.gantt.options.padding;
         const down1 = from_is_below_to ? this.gantt.options.bar_height / 2 - 2 * this.gantt.options.padding : -this.gantt.options.bar_height / 2 + 2* this.gantt.options.padding
+
+         var offset = 1;
+        if (data.start_y > data.end_y) {
+            offset *= -1;
+        }
+
         if (data.start_x >= data.end_x) {
             this.path = `
-                M ${data.start_x} ${data.start_y}
+                M ${data.start_x} ${data.start_y + offset*5}
                 H ${left}
-                V ${data.end_y}
+                V ${data.end_y - offset*5}
                 H ${data.end_x}
                 m 5 -5
                 l -5 5
                 l 5 5`;
         } else {
             this.path = `
-                M ${data.start_x} ${data.start_y}
+                M ${data.start_x} ${data.start_y + offset*5}
                 H ${left}
                 v ${down1}
                 H ${data.end_x + 2* this.gantt.options.padding}
-                V ${data.end_y}
+                V ${data.end_y - offset*5}
                 H ${data.end_x}
                 m 5 -5
                 l -5 5
