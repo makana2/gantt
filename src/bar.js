@@ -55,7 +55,8 @@ export default class Bar {
         this.task._end = new Date(this.task.end);
         this.compute_x();
         this.compute_y();
-        this.compute_duration();
+        //this.compute_duration();
+        this.compute_duration_minutes();
         this.corner_radius = this.gantt.options.bar_corner_radius;
         this.width = this.gantt.config.column_width * this.duration;
         if (!this.task.progress || this.task.progress < 0)
@@ -441,7 +442,8 @@ export default class Bar {
         this.update_label_position();
         this.update_handle_position();
         this.date_changed();
-        this.compute_duration();
+        //this.compute_duration();
+        this.compute_duration_minutes();
 
         if (this.gantt.options.show_expected_progress) {
             this.update_expected_progressbar_position();
@@ -646,6 +648,50 @@ export default class Bar {
             ) / this.gantt.config.step;
 
         this.ignored_duration_raw = this.duration - this.actual_duration_raw;
+    }
+
+    compute_duration_minutes() {
+        let actual_duration_in_days = 0,
+            duration_in_days = 0;
+        for (
+            let d = new Date(this.task._start);
+            d < this.task._end;
+            d.setDate(d.getDate() + 1)
+        ) {
+            duration_in_days++;
+            if (
+                !this.gantt.config.ignored_dates.find(
+                    (k) => k.getTime() === d.getTime(),
+                ) &&
+                (!this.gantt.config.ignored_function ||
+                    !this.gantt.config.ignored_function(d))
+            ) {
+                actual_duration_in_days++;
+            }
+        }
+        const diffMinutes = Math.floor((new Date(this.task._end) - new Date(this.task._start)) / (1000 * 60));
+
+        this.task.actual_duration = duration_in_days;
+
+        var unit = this.gantt.config.unit;
+        var param = 1;
+        if (unit == "day") {
+            param = 60 * 24;
+        }
+        if (unit == "hour") {
+            param = 60;
+        }
+        if (unit == "month") {
+            param = 60 * 24 * 60 * 30;
+        }
+        if (unit == "week") {
+            param = 7 * 24 * 60 * 60;
+        }
+        if (unit == "year") {
+            param = 365 * 24 * 60 * 60;
+        }
+
+        this.duration = diffMinutes /  param;
     }
 
     update_attr(element, attr, value) {
