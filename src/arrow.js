@@ -30,7 +30,7 @@ export default class Arrow {
 
     calculate_path_type_ss() {
         let data = this.get_start_end();
-        const left = data.start_x - 2*this.gantt.options.padding;
+        const left = data.end_x - 2*this.gantt.options.padding;
         var offset = 1;
         if (data.start_y > data.end_y) {
             offset *= -1;
@@ -49,6 +49,7 @@ export default class Arrow {
         let data = this.get_start_end();
         //console.log('[START X, START Y, END X, END Y] ', this.get_start_end())
         const from_is_below_to = this.from_task.task._index > this.to_task.task._index;
+        
 
         const right = data.start_x + 2*this.gantt.options.padding;
         const down1 = from_is_below_to ? this.gantt.options.bar_height / 2 - 2 * this.gantt.options.padding : - this.gantt.options.bar_height / 2 + 2* this.gantt.options.padding
@@ -58,7 +59,7 @@ export default class Arrow {
             offset *= -1;
         }
 
-        if (data.start_x < data.end_x) {
+        if (data.start_x < data.end_x && Math.abs(data.start_x - data.end_x) > 2*this.gantt.options.padding) {
             this.path = `
                 M ${data.start_x} ${data.start_y + offset*6}
                 H ${right}
@@ -83,7 +84,7 @@ export default class Arrow {
     }
     calculate_path_type_ff() {
         let data = this.get_start_end();
-        const right = data.start_x + 2*this.gantt.options.padding;
+        const right = data.end_x + 2*this.gantt.options.padding;
         var offset = 1;
         if (data.start_y > data.end_y) {
             offset *= -1;
@@ -111,7 +112,7 @@ export default class Arrow {
             offset *= -1;
         }
 
-        if (data.start_x >= data.end_x) {
+        if (data.start_x >= data.end_x && Math.abs(data.start_x - data.end_x) > 2*this.gantt.options.padding) {
             this.path = `
                 M ${data.start_x} ${data.start_y + offset*5}
                 H ${left}
