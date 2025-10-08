@@ -335,23 +335,37 @@
 
             const daysSince = (dx) => new Date(today + dx * 86400000);
             let tasks = [
+
+
                 {
                     start: daysSince(-2),
                     end: daysSince(2),
                     name: 'Redesign website',
-                    id: 'Task_0',
-                    progress: random(),
+                    id: 'Task_0'
                 },
-                {
-                    start: daysSince(4),
+
+                                                                                {
+                    start: daysSince(-4),
                     duration: '2d',
                     name: 'Write new content',
                     id: 'Task_1',
-                    progress: random(),
                     important: true,
-                    dependencies: [{id: 'Task_0', type: "EE"}]
+                    dependencies: [{id: 'Task_0', type: "AE"}]
                     //dependencies: 'Task_0',
                 },
+                
+                                                                                {
+                    start: daysSince(-4),
+                    duration: '2d',
+                    name: 'Write new content',
+                    id: 'Task_7',
+                    progress: random(),
+                    important: true,
+                    dependencies: [{id: 'Task_0', type: "AE"}]
+                    //dependencies: 'Task_0',
+                },
+
+
                 {
                     start: daysSince(-2),
                     duration: '2d',
